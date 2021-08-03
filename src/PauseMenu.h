@@ -2,6 +2,7 @@
 #include"Button.h"
 #include"State.h"
 #include"Player.h"
+#include"Tilemap.h"
 class PauseMenu
 {
 private:
@@ -9,13 +10,12 @@ private:
 	sf::RectangleShape background;
 	sf::Text text;
 	std::vector<Button*> button;
-
 public:
 	PauseMenu(sf::RenderWindow& window, sf::Font& font);
 	~PauseMenu();
 
 	//Functions
-	void update(const sf::Vector2f mousePos, std::stack<State*>* states);
+	bool update(const sf::Vector2f mousePos, std::stack<State*>* states);
 	void render(sf::RenderWindow* window);
 };
 

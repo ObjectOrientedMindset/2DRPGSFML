@@ -29,7 +29,7 @@ PauseMenu::~PauseMenu()
 	++iterationCounter;
 }
 
-void PauseMenu::update(const sf::Vector2f mousePos, std::stack<State*>* states)
+bool PauseMenu::update(const sf::Vector2f mousePos, std::stack<State*>* states)
 {
 	for (auto& b : this->button)
 	{
@@ -38,19 +38,15 @@ void PauseMenu::update(const sf::Vector2f mousePos, std::stack<State*>* states)
 	//Save
 	if (this->button[0]->isClicked())
 	{
-		//Player save create a class
-		std::ofstream playerFile("config/player.ini");
-		playerFile.open("config/player.ini");
-		//change position of the player
-		playerFile.close();
 		//Tilemap save
-
+		return true;
 	}
 	//Quit 
 	else if (this->button[1]->isClicked())
 	{
 		states->pop();
 	}
+	return false;
 }
 
 void PauseMenu::render(sf::RenderWindow* window)

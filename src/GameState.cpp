@@ -7,7 +7,7 @@ GameState::GameState(sf::RenderWindow* window, std::stack<State*>* states, std::
 	this->initKeyBinds(supported_keys);
 	this->timerMax = 1000.f;
 	this->timer = this->timerMax;
-	this->player = new Player(150.f);
+	this->player = new Player();
 	this->pause = false;
 }
 void GameState::initKeyBinds(std::map<std::string, int>* supported_keys)
@@ -15,7 +15,7 @@ void GameState::initKeyBinds(std::map<std::string, int>* supported_keys)
 	std::ifstream keys_file("config/gamestate_keys.ini");
 	std::string key = "";
 	std::string key_digit = "";
-
+	if (!keys_file.is_open()) { std::cout << "ERROR:GAMESTATE_KEYS.INI IS NOT OPENED" << std::endl; };
 	while (keys_file >> key >> key_digit)
 	{
 		this->keybinds[key] = supported_keys->at(key_digit);
@@ -89,6 +89,7 @@ void GameState::render(sf::RenderWindow* window)
 	{
 		this->pauseMenu.render(window);
 	}
+		this->tilemap.render(window);
 		this->player->render(window);
 		
 }

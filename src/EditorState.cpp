@@ -5,18 +5,23 @@
 EditorState::EditorState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys)
 	:State(window, states, supported_keys), pmenu(*window, this->pixelFont)
 {
+	this->tilemap = new Tilemap();
 	this->initKeyBinds(supported_keys);
 	this->initEditMap();
 	this->pause = false;
 	this->timerMax = 1000.f;
-	this->timer = this->timerMax;
+	this->timer = 0.f;
 	this->mouseCoordinatesText_x.setFont(this->pixelFont);
 	this->mouseCoordinatesText_x.setCharacterSize(20);
 	this->mouseCoordinatesText_y.setFont(this->pixelFont);
 	this->mouseCoordinatesText_y.setCharacterSize(20);
 	this->tileCollision.setPosition(this->getMousePos().x - 50.f, this->getMousePos().y - 50.f);
 	this->tileCollision.setFillColor(sf::Color(0, 255, 0, 75));
-	this->tileCollision.setSize(sf::Vector2f(this->tilemap.maxSize));
+	this->tileCollision.setSize(sf::Vector2f(this->tilemap->maxSize));
+	this->tileColor = 1;
+	this->text.setFont(this->pixelFont);
+	this->text.setPosition(100.f, 100.f);
+	this->text.setFillColor(sf::Color(100, 100, 100, 255));
 }
 
 
@@ -25,7 +30,7 @@ void EditorState::initKeyBinds(std::map<std::string, int>* supported_keys)
 	std::ifstream keys_file("config/gamestate_keys.ini");
 	std::string key = "";
 	std::string key_digit = "";
-
+	if (!keys_file.is_open()) { std::cout << "ERROR:CANNOT OPEN GAMESTATE_KEYS.INI" << std::endl; }
 	while (keys_file >> key >> key_digit)
 	{
 		this->keybinds[key] = supported_keys->at(key_digit);
@@ -38,20 +43,24 @@ void EditorState::initEditMap()
 		this->editmap.push_back(std::vector<sf::RectangleShape>());
 		for (int y = 0; y < this->window->getSize().y / 100; y++)
 		{
-			this->editmap[x].push_back(sf::RectangleShape(sf::Vector2f(this->tilemap.maxSize)));
+			this->editmap[x].push_back(sf::RectangleShape(sf::Vector2f(this->tilemap->maxSize)));
 			this->editmap[x][y].setPosition(x * 100, y * 100);
 		}
 	}
 }
 void EditorState::addTile(const sf::Vector2f& tile)
 {
-	this->tilemap.update(tile);
+	this->tilemap->update(tile, this->tileColor);
+}
+void EditorState::deleteTile(const sf::Vector2f& tile)
+{
+	this->tilemap->update(tile, this->tileColor);
 }
 bool EditorState::tileCollisionCheck()
 {
-	for (auto& t : this->tilemap.tile)
-	{
-		if (this->tileCollision.getGlobalBounds().intersects(t->getTilePosition()))
+	for (auto& t : this->tilemap->tile)
+	{    // Check if editmap rectangle position and tile position 
+		if (this->getEditMapCollisionCheck() == t->getTilePosition())
 		{   
 			return true;
 		}
@@ -60,7 +69,7 @@ bool EditorState::tileCollisionCheck()
 	return false;
 }
 const sf::Vector2f& EditorState::getEditMapCollisionCheck()
-{ // checking which one of the invisible tiles and return its floatrect
+{ // checking which one of the invisible tiles and return its Vector2f
 	for (int x = 0; x < this->window->getSize().x / 100; x++)
 	{
 		for (int y = 0; y < this->window->getSize().y / 100; y++)
@@ -82,8 +91,38 @@ void EditorState::updateMouseCoordinates()
 	this->mouseCoordinatesText_y.setString(std::to_string((int)(this->getMousePos().y)));
 }
 
+void EditorState::changeTileColor()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+	{
+		this->tileColor = 0;
+		this->text.setString("ADD MODE(GREEN)");
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+	{
+		this->tileColor = 1;
+		this->text.setString("ADD MODE(BLUE)");
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+	{
+		this->tileColor = 2;
+		this->text.setString("ADD MODE(GREY)");
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+	{
+		this->tileColor = 3;
+		this->text.setString("ADD MODE(YELLOW)");
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) //delete tile mode
+	{
+		this->tileColor = 4;
+		this->text.setString("DELETE MODE");
+	}
+}
+
 EditorState::~EditorState()
 {
+	delete this->tilemap;
 }
 
 void EditorState::endState(std::stack<State*>* states)
@@ -112,22 +151,31 @@ void EditorState::update(const float& dt)
 	{   // update coordinates and titleCollision
 		this->updateMouseCoordinates();
 		this->tileCollision.setPosition(this->getMousePos().x - 50.f, this->getMousePos().y - 50.f);
+		this->changeTileColor();
 		// check for mouse click and tile collision addtile
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			if (this->timer >= this->timerMax)
 			{
 				if (!this->tileCollisionCheck())
-				{
+				{  //add tile
 					this->addTile(this->getEditMapCollisionCheck());
+					this->timer = 0.f;
+				}
+				else if(this->tileColor == 4)
+				{ //delete tile
+					this->deleteTile(this->getEditMapCollisionCheck());
 					this->timer = 0.f;
 				}
 			}
 		}
 	}
 	else
-	{
-		this->pmenu.update(this->getMousePos(), this->states);
+	{    // if pmenu return true savetilemap
+		if (this->pmenu.update(this->getMousePos(), this->states))
+		{
+			this->tilemap->saveTileMap();
+		}
 	}
 	++this->timer;
 }
@@ -140,9 +188,10 @@ void EditorState::render(sf::RenderWindow* window)
 	}
 	else 
 	{
-	this->tilemap.render(window);
+	this->tilemap->render(window);
 	window->draw(this->tileCollision);
 	window->draw(this->mouseCoordinatesText_x);
 	window->draw(this->mouseCoordinatesText_y);
+	window->draw(this->text);
 	}
 }

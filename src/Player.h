@@ -19,7 +19,6 @@ private:
 
 public:
 	Player();
-	Player(float movementSpeed);
 	virtual ~Player();
 
 	void initTextures();

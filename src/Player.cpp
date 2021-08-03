@@ -3,15 +3,15 @@
 
 
 
-Player::Player(float movementSpeed)
+Player::Player()
 	:Entities()
 {
 	this->initTextures();
-	this->timerMax = 1000.f;
+	this->timerMax = 500.f;
 	this->timer = this->timerMax;
 	this->initPlayerFromFile();
 	this->playerSprite.setPosition(this->posX, this->posY);
-	this->movementSpeed = movementSpeed;
+	this->movementSpeed = 200.f;
 	this->playerAnimations = new AnimationComponent(this->playerSprite);
 	this->playerAnimations->addAnimation("Down", this->playerSprite, this->timer, 0, 0, 3, 0, 64, 60);
 	this->playerAnimations->addAnimation("Left", this->playerSprite, this->timer, 4, 0, 7, 0, 64, 60);
@@ -21,8 +21,9 @@ Player::Player(float movementSpeed)
 
 void Player::initPlayerFromFile()
 {
-	std::ifstream file("config/player.ini");
-	file.open("config/player.ini");
+	std::fstream file;
+	file.open("config/player.ini", std::ios::in);
+	if (!file.is_open()) { std::cout << "ERROR:CANNOT OPEN PLAYER.INI" << std::endl; }
 	file >> this->posX >> this->posY;
 	file.close();
 }
