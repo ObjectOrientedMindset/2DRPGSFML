@@ -85,11 +85,11 @@ void GameState::update(const float& dt)
 
 void GameState::render(sf::RenderWindow* window)
 {
+		this->tilemap.render(window);
+		this->player->render(window);
 	if (this->pause)
 	{
 		this->pauseMenu.render(window);
 	}
-		this->tilemap.render(window);
-		this->player->render(window);
 		
 }

@@ -5,7 +5,7 @@ void Tilemap::initTilemap()
 { //Load Tilemap from file
 	this->maxSize.x = 100;
 	this->maxSize.y = 100;
-	sf::Vector2f tilePosition;
+	sf::Vector2f tilePosition; tilePosition.x = 0; tilePosition.y = 0;
 	int color = 0;
 	std::fstream file_tilemap;
 	file_tilemap.open("config/tilemap.ini", std::ios::in);

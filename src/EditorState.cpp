@@ -96,22 +96,22 @@ void EditorState::changeTileColor()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 	{
 		this->tileColor = 0;
-		this->text.setString("ADD MODE(GREEN)");
+		this->text.setString("ADD MODE(GRASS)");
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
 	{
 		this->tileColor = 1;
-		this->text.setString("ADD MODE(BLUE)");
+		this->text.setString("ADD MODE(GRASS&FLOWER)");
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
 	{
 		this->tileColor = 2;
-		this->text.setString("ADD MODE(GREY)");
+		this->text.setString("ADD MODE(STONEGROUND)");
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
 	{
 		this->tileColor = 3;
-		this->text.setString("ADD MODE(YELLOW)");
+		this->text.setString("ADD MODE(TREE)");
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) //delete tile mode
 	{
