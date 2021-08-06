@@ -5,9 +5,12 @@
 EditorState::EditorState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys)
 	:State(window, states, supported_keys), pmenu(*window, this->pixelFont)
 {
-	this->tilemap = new Tilemap();
+	this->filePathCount = 1;
+	this->filePathCountMax = 2;
+	this->filePathway[0] = "Config/maps/map0.ini";
+	this->filePathway[1] = "Config/maps/map1.ini";
+	this->tilemaps.push(new Tilemap("Config/maps/map0.ini"));
 	this->initKeyBinds(supported_keys);
-	this->initEditMap();
 	this->pause = false;
 	this->timerMax = 1000.f;
 	this->timer = 0.f;
@@ -17,17 +20,18 @@ EditorState::EditorState(sf::RenderWindow* window, std::stack<State*>* states, s
 	this->mouseCoordinatesText_y.setCharacterSize(20);
 	this->tileCollision.setPosition(this->getMousePos().x - 50.f, this->getMousePos().y - 50.f);
 	this->tileCollision.setFillColor(sf::Color(0, 255, 0, 75));
-	this->tileCollision.setSize(sf::Vector2f(this->tilemap->maxSize));
+	this->tileCollision.setSize(sf::Vector2f(this->tilemaps.top()->maxSize));
 	this->tileColor = 1;
 	this->text.setFont(this->pixelFont);
 	this->text.setPosition(100.f, 100.f);
-	this->text.setFillColor(sf::Color(100, 100, 100, 255));
+	this->text.setFillColor(sf::Color(100, 100, 255, 255));
+	this->initEditMap();
 }
 
 
 void EditorState::initKeyBinds(std::map<std::string, int>* supported_keys)
 {
-	std::ifstream keys_file("config/gamestate_keys.ini");
+	std::ifstream keys_file("Config/gamestate_keys.ini");
 	std::string key = "";
 	std::string key_digit = "";
 	if (!keys_file.is_open()) { std::cout << "ERROR:CANNOT OPEN GAMESTATE_KEYS.INI" << std::endl; }
@@ -43,29 +47,28 @@ void EditorState::initEditMap()
 		this->editmap.push_back(std::vector<sf::RectangleShape>());
 		for (int y = 0; y < this->window->getSize().y / 100; y++)
 		{
-			this->editmap[x].push_back(sf::RectangleShape(sf::Vector2f(this->tilemap->maxSize)));
+			this->editmap[x].push_back(sf::RectangleShape(sf::Vector2f(this->tilemaps.top()->maxSize)));
 			this->editmap[x][y].setPosition(x * 100, y * 100);
 		}
 	}
 }
 void EditorState::addTile(const sf::Vector2f& tile)
 {
-	this->tilemap->update(tile, this->tileColor);
+	this->tilemaps.top()->update(tile, this->tileColor);
 }
 void EditorState::deleteTile(const sf::Vector2f& tile)
 {
-	this->tilemap->update(tile, this->tileColor);
+	this->tilemaps.top()->update(tile, this->tileColor);
 }
 bool EditorState::tileCollisionCheck()
 {
-	for (auto& t : this->tilemap->tile)
+	for (auto& t : this->tilemaps.top()->tile)
 	{    // Check if editmap rectangle position and tile position 
 		if (this->getEditMapCollisionCheck() == t->getTilePosition())
-		{   
+		{
 			return true;
 		}
 	}
-
 	return false;
 }
 const sf::Vector2f& EditorState::getEditMapCollisionCheck()
@@ -120,9 +123,32 @@ void EditorState::changeTileColor()
 	}
 }
 
+void EditorState::changeMap()
+{   //check for max files and key press for map change
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		if (this->filePathCount < this->filePathCountMax)
+		{
+			this->tilemaps.push(new Tilemap(this->filePathway[this->filePathCount]));
+			++this->filePathCount;
+		}
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		if (this->filePathCount > 1)
+		{
+			this->tilemaps.pop();
+			--this->filePathCount;
+		}
+	}
+}
+
 EditorState::~EditorState()
 {
-	delete this->tilemap;
+	while (!this->tilemaps.empty()) {
+		delete this->tilemaps.top();
+		this->tilemaps.pop();
+	}
 }
 
 void EditorState::endState(std::stack<State*>* states)
@@ -148,7 +174,9 @@ void EditorState::update(const float& dt)
 {
 	this->endState(this->states);
 	if (!this->pause) // Unpaused update
-	{   // update coordinates and titleCollision
+	{
+		// update coordinates and tileCollision
+		this->changeMap();
 		this->updateMouseCoordinates();
 		this->tileCollision.setPosition(this->getMousePos().x - 50.f, this->getMousePos().y - 50.f);
 		this->changeTileColor();
@@ -162,7 +190,7 @@ void EditorState::update(const float& dt)
 					this->addTile(this->getEditMapCollisionCheck());
 					this->timer = 0.f;
 				}
-				else if(this->tileColor == 4)
+				else if (this->tileColor == 4)
 				{ //delete tile
 					this->deleteTile(this->getEditMapCollisionCheck());
 					this->timer = 0.f;
@@ -174,7 +202,7 @@ void EditorState::update(const float& dt)
 	{    // if pmenu return true savetilemap
 		if (this->pmenu.update(this->getMousePos(), this->states))
 		{
-			this->tilemap->saveTileMap();
+			this->tilemaps.top()->saveTileMap(this->filePathway[this->filePathCount - 1]);
 		}
 	}
 	++this->timer;
@@ -186,12 +214,12 @@ void EditorState::render(sf::RenderWindow* window)
 	{
 		this->pmenu.render(window);
 	}
-	else 
+	else
 	{
-	this->tilemap->render(window);
-	window->draw(this->tileCollision);
-	window->draw(this->mouseCoordinatesText_x);
-	window->draw(this->mouseCoordinatesText_y);
-	window->draw(this->text);
+		this->tilemaps.top()->render(window);
+		window->draw(this->tileCollision);
+		window->draw(this->mouseCoordinatesText_x);
+		window->draw(this->mouseCoordinatesText_y);
+		window->draw(this->text);
 	}
 }

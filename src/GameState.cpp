@@ -2,7 +2,7 @@
 #include "GameState.h"
 
 GameState::GameState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys)
-	:State(window, states,supported_keys), pauseMenu(*window,this->pixelFont)
+	:State(window, states,supported_keys), pauseMenu(*window,this->pixelFont), tilemap("config/maps/map0.ini")
 {
 	this->initKeyBinds(supported_keys);
 	this->timerMax = 1000.f;
@@ -12,7 +12,7 @@ GameState::GameState(sf::RenderWindow* window, std::stack<State*>* states, std::
 }
 void GameState::initKeyBinds(std::map<std::string, int>* supported_keys)
 {
-	std::ifstream keys_file("config/gamestate_keys.ini");
+	std::ifstream keys_file("Config/gamestate_keys.ini");
 	std::string key = "";
 	std::string key_digit = "";
 	if (!keys_file.is_open()) { std::cout << "ERROR:GAMESTATE_KEYS.INI IS NOT OPENED" << std::endl; };

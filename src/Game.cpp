@@ -21,11 +21,6 @@ void Game::initSupportedKeys()
 	keys_file.close();
 }
 
-void Game::endApplication()
-{
-	std::cout << "End application";
-}
-
 Game::Game()
 {
 	this->initWindow();

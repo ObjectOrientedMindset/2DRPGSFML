@@ -8,7 +8,7 @@ class EditorState :
 private:
     //Variables
     PauseMenu pmenu;
-    Tilemap* tilemap;
+    std::stack<Tilemap*> tilemaps;
     bool pause;
     float timer;
     float timerMax;
@@ -20,6 +20,8 @@ private:
     std::vector<std::vector<sf::RectangleShape>> editmap;
     int tileColor;
     sf::Text text;
+    std::string filePathway[2];
+    int filePathCount, filePathCountMax;
 
     //Functions
     void initKeyBinds(std::map<std::string, int>* supported_keys);
@@ -30,6 +32,7 @@ private:
     const sf::Vector2f& getEditMapCollisionCheck();
     void updateMouseCoordinates();
     void changeTileColor();
+    void changeMap();
 public:
     EditorState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys);
     virtual ~EditorState();

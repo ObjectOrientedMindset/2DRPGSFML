@@ -22,7 +22,7 @@ Player::Player()
 void Player::initPlayerFromFile()
 {
 	std::fstream file;
-	file.open("config/player.ini", std::ios::in);
+	file.open("Config/player.ini", std::ios::in);
 	if (!file.is_open()) { std::cout << "ERROR:CANNOT OPEN PLAYER.INI" << std::endl; }
 	file >> this->posX >> this->posY;
 	file.close();

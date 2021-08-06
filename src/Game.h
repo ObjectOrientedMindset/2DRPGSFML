@@ -19,7 +19,6 @@ private:
 
 	void initWindow();
 	void initSupportedKeys();
-	void endApplication();
 public:
 	Game();
 	virtual ~Game();

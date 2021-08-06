@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "Tilemap.h"
 
-void Tilemap::initTilemap()
+void Tilemap::initTilemap(const std::string& filePathway)
 { //Load Tilemap from file
 	this->maxSize.x = 100;
 	this->maxSize.y = 100;
 	sf::Vector2f tilePosition; tilePosition.x = 0; tilePosition.y = 0;
 	int color = 0;
 	std::fstream file_tilemap;
-	file_tilemap.open("config/tilemap.ini", std::ios::in);
+	file_tilemap.open(filePathway, std::ios::in);
 	if (!file_tilemap.is_open()) { std::cout << "ERROR:CANNOT OPEN TILEMAP.INI" << std::endl; }
 	while (file_tilemap >> tilePosition.x >> tilePosition.y >> color)
 	{
@@ -18,9 +18,9 @@ void Tilemap::initTilemap()
 	file_tilemap.close();
 }
 
-Tilemap::Tilemap()
+Tilemap::Tilemap(const std::string& filePathway)
 {
-	this->initTilemap();
+	this->initTilemap(filePathway);
 }
 
 Tilemap::~Tilemap()
@@ -36,10 +36,10 @@ Tilemap::~Tilemap()
 }
 
 
-void Tilemap::saveTileMap()
+void Tilemap::saveTileMap(const std::string& filePathway)
 { //Save Tilemap from file
 	std::fstream file_tilemap;
-	file_tilemap.open("config/tilemap.ini", std::ios::out);
+	file_tilemap.open(filePathway, std::ios::out);
 	if (!file_tilemap.is_open()) { std::cout << "ERROR:CANNOT OPEN TILEMAP.INI" << std::endl; }
 	for (unsigned int i = 0; i < this->tileColor.size(); i++)
 	{
