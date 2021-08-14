@@ -9,6 +9,11 @@ State::State(sf::RenderWindow* window, std::stack<State*>* states, std::map<std:
 	this->supported_keys= supported_keys;
 	this->pixelFont.loadFromFile("Fonts/PixellettersFull.ttf");
 	this->mousePos = sf::Vector2f(sf::Mouse::getPosition(*this->window));
+	this->filePathway[0] = "Config/maps/map0.ini";
+	this->filePathway[1] = "Config/maps/map1.ini";
+	this->filePathway[2] = "Config/maps/map2.ini";
+	this->filePathway[3] = "Config/maps/map3.ini";
+	this->filePathway[4] = "Config/maps/map4.ini";
 }
 
 State::~State()

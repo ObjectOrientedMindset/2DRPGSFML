@@ -58,6 +58,10 @@ const sf::Vector2f& Player::getPlayerPosition()
 {
 	return this->playerSprite.getPosition();
 }
+void Player::setPlayerPosition(float x, float y)
+{
+	this->playerSprite.setPosition(x, y);
+}
 void Player::update()
 {
 	++this->timer;

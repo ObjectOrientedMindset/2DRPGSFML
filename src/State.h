@@ -13,6 +13,8 @@ protected:
 	sf::Vector2f mousePos;
 	//Keys
 	std::map<std::string, int>* supported_keys;
+	//Files
+	std::string filePathway[5];
 public:
 	State(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys);
 	virtual ~State();

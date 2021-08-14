@@ -5,7 +5,7 @@
 void Game::initWindow()
 {
 	//Initialize Game window
-	this->window = new sf::RenderWindow(sf::VideoMode(sf::VideoMode::getDesktopMode()), "SlavetoLegend", sf::Style::Close | sf::Style::Titlebar);
+	this->window = new sf::RenderWindow(sf::VideoMode(1024,960), "SlavetoLegend", sf::Style::Close | sf::Style::Titlebar);
 }
 
 void Game::initSupportedKeys()

@@ -2,8 +2,11 @@
 #include "GameState.h"
 
 GameState::GameState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys)
-	:State(window, states,supported_keys), pauseMenu(*window,this->pixelFont), tilemap("config/maps/map0.ini")
+	:State(window, states,supported_keys), pauseMenu(*window,this->pixelFont)
 {
+	this->tilemaps.push(new Tilemap());
+	this->filePathCount = 1;
+	this->filePathCountMax = 5;
 	this->initKeyBinds(supported_keys);
 	this->timerMax = 1000.f;
 	this->timer = this->timerMax;
@@ -23,9 +26,35 @@ void GameState::initKeyBinds(std::map<std::string, int>* supported_keys)
 	keys_file.close();
 }
 
+void GameState::changeMap()
+{
+	if (this->player->getPlayerPosition().x > this->window->getSize().x)
+	{
+		if (this->filePathCount < this->filePathCountMax)
+		{
+			this->tilemaps.push(new Tilemap(this->filePathway[this->filePathCount]));
+			++this->filePathCount;
+			this->player->setPlayerPosition(10.f, this->player->getPlayerPosition().y);
+		}
+	}
+	if (this->player->getPlayerPosition().x < 0.f)
+	{
+		if (this->filePathCount > 1)
+		{
+			this->tilemaps.pop();
+			--this->filePathCount;
+			this->player->setPlayerPosition(this->window->getSize().x - 10.f, this->player->getPlayerPosition().y);
+		}
+	}
+}
+
 GameState::~GameState()
 {
 	delete this->player;
+	while (!this->tilemaps.empty()) {
+		delete this->tilemaps.top();
+		this->tilemaps.pop();
+	}
 }
 
 void GameState::endState(std::stack<State*>* states)
@@ -76,6 +105,7 @@ void GameState::update(const float& dt)
 	{
 		this->updatePlayerInput(dt);
 		this->player->update();
+		this->changeMap();
 	}
 	else
 	{
@@ -85,8 +115,8 @@ void GameState::update(const float& dt)
 
 void GameState::render(sf::RenderWindow* window)
 {
-		this->tilemap.render(window);
-		this->player->render(window);
+	this->tilemaps.top()->render(window);
+	this->player->render(window);
 	if (this->pause)
 	{
 		this->pauseMenu.render(window);

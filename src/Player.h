@@ -25,6 +25,7 @@ public:
 	void playerMovement(std::string direction,float dirX, float dirY,const float& dt);
 
 	const sf::Vector2f& getPlayerPosition();
+	void setPlayerPosition(float x, float y);
 	void update();
 	void render(sf::RenderTarget* target);
 };

@@ -18,9 +18,9 @@ private:
     sf::RectangleShape tileCollision;
     sf::RectangleShape editMapRectangle;
     std::vector<std::vector<sf::RectangleShape>> editmap;
-    int tileColor;
+    int tileCode;
+    int tileLayer;
     sf::Text text;
-    std::string filePathway[2];
     int filePathCount, filePathCountMax;
 
     //Functions
@@ -28,10 +28,10 @@ private:
     void initEditMap();
     void addTile(const sf::Vector2f& tile);
     void deleteTile(const sf::Vector2f& tile);
-    bool tileCollisionCheck();
+    bool tileCollisionCheck(const int& tile_layer);
     const sf::Vector2f& getEditMapCollisionCheck();
     void updateMouseCoordinates();
-    void changeTileColor();
+    void changetileCode();
     void changeMap();
 public:
     EditorState(sf::RenderWindow* window, std::stack<State*>* states, std::map<std::string, int>* supported_keys);
