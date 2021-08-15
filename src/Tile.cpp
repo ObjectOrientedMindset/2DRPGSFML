@@ -29,6 +29,10 @@ Tile::Tile(const float& posX, const float& posY, const sf::Vector2f& size, const
 	this->tileLayer = tile_layer;
 	this->sprite.setTexture(this->tile[tile_code]);
 	this->sprite.setPosition(posX, posY);
+	if (tile_code == 2)
+	{
+		this->sprite.setScale(1.064, 1.064);
+	}
 }
 
 Tile::~Tile()

@@ -7,7 +7,7 @@ EditorState::EditorState(sf::RenderWindow* window, std::stack<State*>* states, s
 {
 	this->tilemaps.push(new Tilemap());
 	this->filePathCount = 1;
-	this->filePathCountMax = 5;
+	this->filePathCountMax = 10;
 	this->initKeyBinds(supported_keys);
 	this->pause = false;
 	this->timerMax = 1000.f;
