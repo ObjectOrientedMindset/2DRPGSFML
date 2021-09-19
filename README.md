@@ -5,4 +5,4 @@
 
 #Description
 
-This repo was to learn programming in general feel free to use and improve.
+This repo was for learn low level programming in general feel free to use and improve.
