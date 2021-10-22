@@ -5,4 +5,4 @@
 
 #Description
 
-This repo was for learn low level programming in general feel free to use and send feedbacks.
+Game Engine 2D made in SFML/C++ not completed yet.
